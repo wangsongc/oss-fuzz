@@ -38,7 +38,8 @@ def check_lib_fuzzing_engine(project_path):
   for line_num, line in enumerate(build_sh_lines):
     uncommented_code = line.split('#')[0]
     if '-lFuzzingEngine' in uncommented_code:
-      print('build.sh contains -lFuzzingEngine on line:', line_num)
+      print('''Error: build.sh contains -lFuzzingEngine on line: {0}.
+Please use $LIB_FUZZING_ENGINE.'''.format(line_num))
       return False
   return True
 
