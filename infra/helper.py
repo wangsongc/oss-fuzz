@@ -33,13 +33,13 @@ OSSFUZZ_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 BUILD_DIR = os.path.join(OSSFUZZ_DIR, 'build')
 
 BASE_IMAGES = [
-    'gcr.io/oss-fuzz-base/base-image',
-    'gcr.io/oss-fuzz-base/base-clang',
-    'gcr.io/oss-fuzz-base/base-builder',
-    'gcr.io/oss-fuzz-base/base-runner',
-    'gcr.io/oss-fuzz-base/base-runner-debug',
-    'gcr.io/oss-fuzz-base/base-msan-builder',
-    'gcr.io/oss-fuzz-base/msan-builder',
+    'wangsongc/base-image',
+    'wangsongc/base-clang',
+    'wangsongc/base-builder',
+    'wangsongc/base-runner',
+    'wangsongc/base-runner-debug',
+    'wangsongc/base-msan-builder',
+    'wangsongc/msan-builder',
 ]
 
 VALID_PROJECT_NAME_REGEX = re.compile(r'^[a-zA-Z0-9_-]+$')
@@ -449,7 +449,7 @@ def build_fuzzers(args):
   if args.sanitizer == 'memory':
     docker_run([
         '-v', '%s:/work' % project_work_dir,
-        'gcr.io/oss-fuzz-base/msan-builder',
+        'wangsongc/msan-builder',
         'bash', '-c', 'cp -r /msan /work'])
     env.append('MSAN_LIBS_PATH=' + '/work/msan')
 
@@ -486,7 +486,7 @@ def build_fuzzers(args):
         '-v', '%s:/out' % project_out_dir,
         '-v', '%s:/work' % project_work_dir
     ] + _env_to_docker_args(env) + [
-        'gcr.io/oss-fuzz-base/base-msan-builder',
+        'wangsongc/base-msan-builder',
         'patch_build.py', '/out'
     ])
 
@@ -512,7 +512,7 @@ def check_build(args):
 
   run_args = _env_to_docker_args(env) + [
       '-v', '%s:/out' % _get_output_dir(args.project_name),
-      '-t', 'gcr.io/oss-fuzz-base/base-runner'
+      '-t', 'wangsongc/base-runner'
   ]
 
   if args.fuzzer_name:
@@ -686,7 +686,7 @@ def coverage(args):
   run_args.extend([
       '-v', '%s:/out' % _get_output_dir(args.project_name),
       '-p', '%s:%s' % (args.port, args.port),
-      '-t', 'gcr.io/oss-fuzz-base/base-runner',
+      '-t', 'wangsongc/base-runner',
   ])
 
   run_args.append('coverage')
@@ -721,7 +721,7 @@ def run_fuzzer(args):
 
   run_args = _env_to_docker_args(env) + [
       '-v', '%s:/out' % _get_output_dir(args.project_name),
-      '-t', 'gcr.io/oss-fuzz-base/base-runner',
+      '-t', 'wangsongc/base-runner',
       'run_fuzzer',
       args.fuzzer_name,
   ] + args.fuzzer_args
@@ -754,7 +754,7 @@ def reproduce(args):
   run_args = _env_to_docker_args(env) + [
       '-v', '%s:/out' % _get_output_dir(args.project_name),
       '-v', '%s:/testcase' % _get_absolute_path(args.testcase_path),
-      '-t', 'gcr.io/oss-fuzz-base/%s' % image_name,
+      '-t', 'wangsongc/%s' % image_name,
       'reproduce',
       args.fuzzer_name,
       '-runs=100',
